@@ -27,8 +27,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.InputEvent;
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -72,7 +73,7 @@ public class JdotxtTaskPanel extends JPanel {
 	
 	private boolean compactMode;
 	
-	private ArrayList<TaskListener> taskListenerList;
+	private List<TaskListener> taskListenerList;
 	
 	private char oldPriority;
 	private String oldDate;
@@ -95,7 +96,7 @@ public class JdotxtTaskPanel extends JPanel {
 		this.task = task;
 		this.isNewTask = isNewTask;
 		this.compactMode = compactMode;
-		taskListenerList = new ArrayList<TaskListener>();
+		taskListenerList = new CopyOnWriteArrayList<>();
 		
 		oldPriority = task.getPriority().getCode().charAt(0);
 		oldDate = task.getPrependedDate();
@@ -211,8 +212,6 @@ public class JdotxtTaskPanel extends JPanel {
 		if (!compactMode) panelTodoInfo.add(textDate); // No-Date-mod
 		panelTodoInfo.setBorder(BorderFactory.createEmptyBorder());
 		panelTodoInfo.setBackground(Color.WHITE);
-		panelTodoInfo.setMaximumSize(new Dimension(Integer.MAX_VALUE,
-					  (int) 2.5 * panelTodoInfo.getPreferredSize().height));
 		panelTodoInfo.setAlignmentY(TOP_ALIGNMENT);
 		
 		if (!compactMode) panelTodoCommands.setLayout(new BoxLayout(panelTodoCommands, BoxLayout.Y_AXIS));

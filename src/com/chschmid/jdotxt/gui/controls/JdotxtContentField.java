@@ -33,7 +33,7 @@ public class JdotxtContentField extends JTextArea {
 
 	private AutocompletionModes mode = AutocompletionModes.PLAIN;
 
-	private List<Character> separators = Arrays.asList('-', ':', '/', '_', '.');
+	private final List<Character> separators = Arrays.asList('-', ':', '/', '_', '.');
 
 	private AutocompletionList list;
 	private Action a = null;
@@ -42,10 +42,8 @@ public class JdotxtContentField extends JTextArea {
 
 	public JdotxtContentField(String text) {
 		super(text);
-		super.setLineWrap(true);
-		super.setWrapStyleWord(true);
-		super.setRows(0);
-
+		this.setLineWrap(true);
+		this.setWrapStyleWord(true);
 
 		UndoTool.addUndoFunctionality(this);
 
@@ -221,7 +219,7 @@ public class JdotxtContentField extends JTextArea {
 		PLAIN, PROJECT, CONTEXT
 	}
 
-	class AutocompletionList extends JDialog {
+	static class AutocompletionList extends JDialog {
 		Vector<String> autocomplete = new Vector<>();
 		JList<String> list;
 		int selectionIndex = 0;
