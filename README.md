@@ -20,6 +20,7 @@ My fork has the following additional changes:
 
  * allow multi-line tasks
  * add undo functionality (Ctrl-Z, Ctrl-Y) to task text
+ * colored background based on priority
  * confirmation dialog before deleting tasks
  * tweaks to UI to my preference (Nimbus look and feel, smaller fonts)
 
