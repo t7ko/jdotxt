@@ -24,6 +24,7 @@ import com.chschmid.jdotxt.gui.controls.*;
 import com.chschmid.jdotxt.gui.utils.SortUtils;
 import com.chschmid.jdotxt.util.DelayedActionHandler;
 import com.chschmid.jdotxt.util.FileModifiedListener;
+import com.chschmid.jdotxt.util.DTHelper;
 import com.todotxt.todotxttouch.task.Priority;
 import com.todotxt.todotxttouch.task.Task;
 import com.todotxt.todotxttouch.task.TaskBag;
@@ -39,12 +40,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-
+import java.util.*;
 
 @SuppressWarnings("serial")
 // The application main window
@@ -337,7 +333,10 @@ public class JdotxtGUI extends JFrame {
 			public void windowLostFocus(WindowEvent arg0) { }
 			@Override
 			public void windowGainedFocus(WindowEvent arg0) {
-				if (unresolvedFileModification && !reloadDialogVisible) showReloadDialog();
+				if (unresolvedFileModification && !reloadDialogVisible) {
+					// System.out.println("[" + DTHelper.getTimeString() + "] windowGainedFocus");
+					showReloadDialog();
+				}
 			}
 		});
 		
@@ -349,7 +348,7 @@ public class JdotxtGUI extends JFrame {
 				EventQueue.invokeLater(new Runnable() {
 					@Override
 					public void run() {
-						// System.out.println("Entering fileModified:");
+						// System.out.println("[" + DTHelper.getTimeString() + "] Entering fileModified:");
 						// First, check whether the checksum has changed. Since
 						// recently, something has changed with Dropbox, and
 						// the app now constantly shows "file modified" dialog,
@@ -358,12 +357,18 @@ public class JdotxtGUI extends JFrame {
 						try {
 							byte[] lastSaveChecksum = taskBag.getLastSaveChecksum();
 							byte[] newChecksum = Jdotxt.getTodoFileChecksum();
-							// System.out.println("Checking: " + DatatypeConverter.printHexBinary(lastSaveChecksum) + " vs. " + DatatypeConverter.printHexBinary(newChecksum));
-							if (Arrays.equals(lastSaveChecksum, newChecksum)) return;
+							// System.out.printf( "[%s] Checking: %s vs. %s is-equal? %b%n", DTHelper.getTimeString(), DatatypeConverter.printHexBinary(lastSaveChecksum), DatatypeConverter.printHexBinary(newChecksum), Arrays.equals(lastSaveChecksum, newChecksum));
+							if (Arrays.equals(lastSaveChecksum, newChecksum)) {
+								unresolvedFileModification = false;
+								return;
+							}
 						} catch (Exception e) {
-							// System.out.println(e.getMessage());
+							System.out.println(e.getMessage());
 						}
-						if (reloadDialogVisible == false && JdotxtGUI.this.isFocused()) showReloadDialog();
+						if (reloadDialogVisible == false && JdotxtGUI.this.isFocused()) {
+							// System.out.println("[" + DTHelper.getTimeString() + "] in fileModified");
+							showReloadDialog();
+						}
 					}
 				});
 			}
@@ -662,6 +667,9 @@ public class JdotxtGUI extends JFrame {
 	        		tasksPane.getVerticalScrollBar().setValue(0);
 	        		taskList.requestFocusNewTask(); // New task
 	        	}
+				if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_D) {
+					toolbar.switchTodoFile();
+				}
 	        }
 	        //Allow the event to be redispatched
 	        return false;

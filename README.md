@@ -49,7 +49,38 @@ but I could at least get 2x scaling by manually running
 
 Copyright 2013-2018 Christian M. Schmid
 
-another open source cross-platform GUI for the todo.txt file format
+Another open source cross-platform GUI for the todo.txt file format
+
+#### Some highlights on features of jdotxt
+
+* Quick filtering by context + project -- see Filter panes on the left:
+   * Multiple selection.
+   * Quick filter by typed keystrokes (put focus on the pane and start
+     typing).
+* Auto-add context/project to new entry (copied from currently selected
+  entry).
+* Support for hidden entries (h:1).
+* Support for threshold dates (t:) and due dates (due:), support for
+  recurrence (`rec:[+]Du` - optional `+` to specify strict recurrence based on
+  due/threshold date, by default will increment based on completion date; `D` is
+  number of units, `u` is unit -- one of `d` day, `w` week, `m` month, `y`
+  year; example `rec:11d` schedule next task to 11 days after completion,
+  `rec:+1m` schedule next task exactly one month away from threshold/due
+  date).
+* Auto-completion of context/project when typing entry text.
+* Customizable sort.  Saving sorts for future reuse.
+* Hotkeys:
+   * `CTRL-F` -- jump to search field.
+   * `CTRL-S` -- save todo.txt file. (You can also enable auto-save in
+     preferneces.)
+   * `CTRL-R` -- reload todo.txt (reloads automatically if detects that file
+     has changed underneath).
+   * `CTRL-N` -- "New Task", jumps to New Task entry field.
+   * `CTRL-D` -- jump to previously open todo.txt file.
+
+#### Downloads
+
+Go to "Releases" section of the GitHub project to get the latest version.
 
 #### Website
 
@@ -69,15 +100,19 @@ to set up your build system.
 
 To build jdotxt
 
-1. Download the latest sources from github (e.g., "git clone https://github.com/chms/jdotxt.git")
+1. Download the latest sources from github (e.g., `git clone https://github.com/t7ko/jdotxt`)
 
-2. Move into the directory (e.g., "cd jdotxt")
+2. Move into the directory (e.g., `cd jdotxt`)
 
-3. Run ant (i.e., "ant")
+3. Run ant (i.e., `ant`)
 
 You can run the resulting jar file by executing
 
-java -jar jar/jdotxt.jar
+`java -jar jar/jdotxt.jar`
+
+Or, to run GUI-only on Windows, with detached console:
+
+`javaw -jar jar/jdotxt.jar`
 
 #### Third Party Code
 
