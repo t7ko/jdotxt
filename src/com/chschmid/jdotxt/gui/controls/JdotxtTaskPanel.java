@@ -27,19 +27,13 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.InputEvent;
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.InputMap;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.DefaultEditorKit;
@@ -51,6 +45,16 @@ import com.todotxt.todotxttouch.util.Util;
 
 @SuppressWarnings("serial")
 public class JdotxtTaskPanel extends JPanel {
+
+	private static final Map<Priority,Color> BACKGROUND_COLOR = new EnumMap<Priority, Color>(Priority.class){{
+		put(Priority.A, new Color(230,50,0));
+		put(Priority.B, new Color(255,140,0));
+		put(Priority.C, new Color(255,200,0));
+		put(Priority.D, new Color(230,230,0));
+		put(Priority.E, new Color(100,200,100));
+		put(Priority.NONE, new Color(220,220,220));
+	}};
+
 	public final static short ADDNEW             = 0;
 	public final static short PRIORITY           = 1;
 	public final static short CONTENT            = 2;
@@ -71,52 +75,52 @@ public class JdotxtTaskPanel extends JPanel {
 
 	private JdotxtImageCheckBox checkDone;
 	private JdotxtImageButton buttonDelete;
-	
+
 	public static final ImageIcon imgComplete   = Util.createImageIcon("/res/drawable/check.png");
 	public static final ImageIcon imgIncomplete = Util.createImageIcon("/res/drawable/uncheck.png");
 	public static final ImageIcon imgDelete     = Util.createImageIcon("/res/drawable/delete.png");
-	
+
 	private Task task;
 	private boolean isNewTask;
-	
+
 	private boolean compactMode;
-	
-	private ArrayList<TaskListener> taskListenerList;
-	
+
+	private List<TaskListener> taskListenerList;
+
 	private char oldPriority;
 	private String oldDate;
 	private String oldContent;
-	
+
 	public JdotxtTaskPanel(Task task) {
 		initJdotxtTaskPanel(task, false, false);
 	}
-	
+
 	public JdotxtTaskPanel(Task task, boolean isNewTask) {
 		initJdotxtTaskPanel(task, isNewTask, false);
 	}
-	
+
 	public JdotxtTaskPanel(Task task, boolean isNewTask, boolean compactMode) {
 		initJdotxtTaskPanel(task, isNewTask, compactMode);
 	}
-	
+
 	private void initJdotxtTaskPanel(Task task, boolean isNewTask, boolean compactMode) {
 		//this.task = new Task(task);
 		this.task = task;
 		this.isNewTask = isNewTask;
 		this.compactMode = compactMode;
-		taskListenerList = new ArrayList<TaskListener>();
-		
+		taskListenerList = new CopyOnWriteArrayList<>();
+
 		oldPriority = task.getPriority().getCode().charAt(0);
 		oldDate = task.getPrependedDate();
 		oldContent = task.getText();
-		
+
 		initLayout();
 	}
-	
+
 	private void initLayout() {
 		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 		this.removeAll();
-		
+
 		panelTodoInfo     = new JPanel();
 		panelTodoCommands = new JPanel();
 		textContent       = new JdotxtContentField(task.getText());
@@ -124,7 +128,7 @@ public class JdotxtTaskPanel extends JPanel {
 		textPriority      = new JdotxtPriorityField(task.getPriority().getCode().charAt(0));
 		checkDone         = new JdotxtImageCheckBox(JdotxtTaskPanel.imgIncomplete, JdotxtTaskPanel.imgComplete);
 		buttonDelete      = new JdotxtImageButton(JdotxtTaskPanel.imgDelete);
-		
+
 		textPriority.setAlignmentY(TOP_ALIGNMENT);
 		textPriority.setBorder(BorderFactory.createLineBorder(Color.WHITE,4));
 		textPriority.setFont(JdotxtGUI.fontR);
@@ -141,11 +145,10 @@ public class JdotxtTaskPanel extends JPanel {
 			@Override
 			public void focusGained(FocusEvent arg0) { fireFocusGained(PRIORITY); }
 		});
-		
+
 		textContent.setFont(JdotxtGUI.fontR);
 		textContent.setBorder(BorderFactory.createLineBorder(Color.WHITE,4));
 		textContent.setSelectionColor(JdotxtGUI.COLOR_PRESSED);
-		textContent.setPreferredSize(new Dimension(0, textContent.getPreferredSize().height));
 		textContent.getDocument().addDocumentListener(new TextListener());
 		textContent.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke("ENTER"), "ENTER");
 		textContent.getActionMap().put("ENTER", new EnterAction(CONTENT));
@@ -174,7 +177,7 @@ public class JdotxtTaskPanel extends JPanel {
 				fireFocusGained(CONTENT);
 			}
 		});
-		
+
 		textDate.setFont(JdotxtGUI.fontR.deriveFont(12f));
 		textDate.setBorder(BorderFactory.createLineBorder(Color.WHITE,4));
 		textDate.setSelectionColor(JdotxtGUI.COLOR_PRESSED);
@@ -188,7 +191,7 @@ public class JdotxtTaskPanel extends JPanel {
 			@Override
 			public void focusGained(FocusEvent arg0) { fireFocusGained(DATE); }
 		});
-		
+
 		checkDone.setBackground(Color.WHITE);
 		checkDone.setAlignmentX(CENTER_ALIGNMENT);
 		checkDone.setHoverColor(JdotxtGUI.COLOR_HOVER);
@@ -202,7 +205,7 @@ public class JdotxtTaskPanel extends JPanel {
 			@Override
 			public void focusGained(FocusEvent arg0) { fireFocusGained(COMPLETED); }
 		});
-		
+
 		buttonDelete.setBackground(Color.WHITE);
 		buttonDelete.setAlignmentX(CENTER_ALIGNMENT);
 		buttonDelete.setHoverColor(JdotxtGUI.COLOR_HOVER);
@@ -215,24 +218,26 @@ public class JdotxtTaskPanel extends JPanel {
 			@Override
 			public void focusGained(FocusEvent arg0) { fireFocusGained(DELETE); }
 		});
-		
+
 		panelTodoInfo.setLayout(new BoxLayout(panelTodoInfo, BoxLayout.Y_AXIS));
 		panelTodoInfo.add(textContent);
 		if (!compactMode) panelTodoInfo.add(textDate); // No-Date-mod
 		panelTodoInfo.setBorder(BorderFactory.createEmptyBorder());
 		panelTodoInfo.setBackground(Color.WHITE);
-		panelTodoInfo.setMaximumSize(new Dimension(Integer.MAX_VALUE, panelTodoInfo.getPreferredSize().height));
 		panelTodoInfo.setAlignmentY(TOP_ALIGNMENT);
-		
+
 		if (!compactMode) panelTodoCommands.setLayout(new BoxLayout(panelTodoCommands, BoxLayout.Y_AXIS));
 		else panelTodoCommands.setLayout(new BoxLayout(panelTodoCommands, BoxLayout.X_AXIS));
-		
+
 		panelTodoCommands.add(checkDone);
 		panelTodoCommands.add(buttonDelete);
 		panelTodoCommands.setBorder(BorderFactory.createEmptyBorder());
 		panelTodoCommands.setBackground(Color.WHITE);
 		panelTodoCommands.setAlignmentY(TOP_ALIGNMENT);
-		
+		JPanel filler = new JPanel();
+		filler.setBackground(Color.WHITE);
+		panelTodoCommands.add(filler);
+
 		if (isNewTask) {
 			if (!compactMode) buttonNewTask = new JdotxtImageButton(Util.createImageIcon("/res/drawable/add.png"));
 			else buttonNewTask = new JdotxtImageButton(Util.createImageIcon("/res/drawable/add_25.png"));
@@ -244,15 +249,15 @@ public class JdotxtTaskPanel extends JPanel {
 			this.setBorder(BorderFactory.createMatteBorder(2, 0, 2, 0, JdotxtGUI.COLOR_HOVER));
 		} else this.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, JdotxtGUI.COLOR_GRAY_PANEL));
 		this.setBackground(Color.WHITE);
-		
+
 		if (isNewTask) this.add(buttonNewTask);
 		else this.add(Box.createRigidArea(new Dimension(4, 0)));
-		
+
 		this.add(textPriority);
 		this.add(panelTodoInfo);
 		this.add(panelTodoCommands);
 		this.setOpaque(true);
-		
+
 		InputMap im = this.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         ActionMap am = this.getActionMap();
         im.put(KeyStroke.getKeyStroke('D', InputEvent.CTRL_DOWN_MASK), DONE_ACTION);
@@ -262,10 +267,18 @@ public class JdotxtTaskPanel extends JPanel {
 			public void actionPerformed(ActionEvent e) { checkDone.setSelected(!checkDone.isSelected()); }
 		});
         am.put(DELETE_ACTION, new DeleteListener());
-		
+
 		if (task.isCompleted()) markComplete();
+		setBackgroundByPriority();
 	}
-	
+
+	private void setBackgroundByPriority() {
+		Color bg = BACKGROUND_COLOR.getOrDefault(this.task.getPriority(), Color.WHITE);
+		this.setBackground(bg);
+		this.textPriority.setBackground(bg);
+		textPriority.setBorder(BorderFactory.createLineBorder(bg    ,4));
+	}
+
 	public void markComplete() {
 		textContent.setForeground(Color.GRAY);
 		textDate.setForeground(Color.GRAY);
@@ -308,6 +321,7 @@ public class JdotxtTaskPanel extends JPanel {
 		textDate.setDate(task.getPrependedDate());
 		if(task.isCompleted()) markComplete();
 		else markIncomplete();
+		setBackgroundByPriority();
 	}
 	
 	public Task getTask() {
@@ -367,6 +381,7 @@ public class JdotxtTaskPanel extends JPanel {
 				oldPriority = textPriority.getText().charAt(1);
 				task.setPriority(Priority.toPriority(Character.toString(oldPriority)));
 				fireTaskUpdated(PRIORITY);
+				setBackgroundByPriority();
 			}
 		}
 	}
@@ -427,7 +442,9 @@ public class JdotxtTaskPanel extends JPanel {
 	
 	private class DeleteListener extends AbstractAction {
 		public void actionPerformed(ActionEvent e) {
-			fireTaskDeleted();
+			if (JOptionPane.showConfirmDialog(null, "Really delete task?", "Delete Task?",
+				  JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+				fireTaskDeleted();
 		}
 	}
 	

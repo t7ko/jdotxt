@@ -20,6 +20,7 @@
 package com.chschmid.jdotxt.gui.controls;
 
 import com.chschmid.jdotxt.Jdotxt;
+import com.chschmid.jdotxt.gui.UndoTool;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,11 +29,11 @@ import java.util.*;
 import java.util.List;
 
 @SuppressWarnings("serial")
-public class JdotxtContentField extends JTextField{
+public class JdotxtContentField extends JTextArea {
 
 	private AutocompletionModes mode = AutocompletionModes.PLAIN;
 
-	private List<Character> separators = Arrays.asList('-', ':', '/', '_', '.');
+	private final List<Character> separators = Arrays.asList('-', ':', '/', '_', '.');
 
 	private AutocompletionList list;
 	private Action a = null;
@@ -41,6 +42,11 @@ public class JdotxtContentField extends JTextField{
 
 	public JdotxtContentField(String text) {
 		super(text);
+		this.setLineWrap(true);
+		this.setWrapStyleWord(true);
+
+		UndoTool.addUndoFunctionality(this);
+
 		addKeyListener(new KeyAdapter(){
 			@Override
 			public void keyPressed(KeyEvent keyEvent) {
@@ -213,7 +219,7 @@ public class JdotxtContentField extends JTextField{
 		PLAIN, PROJECT, CONTEXT
 	}
 
-	class AutocompletionList extends JDialog {
+	static class AutocompletionList extends JDialog {
 		Vector<String> autocomplete = new Vector<>();
 		JList<String> list;
 		int selectionIndex = 0;

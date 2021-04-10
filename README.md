@@ -1,5 +1,49 @@
-jdotxt
-======
+# jdotxt
+
+open source cross-platform GUI for the todo.txt file format
+
+## Fork by Sebastian Wild
+
+This is based on the fork by [t7ko](https://github.com/t7ko/jdotxt)
+of the original jdotxt by Chritian M. Schmid (below is the original readme.)
+
+
+
+t7ko already added:
+
+ * autocompletion for context / projects
+ * custom sorting order dialog
+ * more GUI elements for quick settings
+
+
+My fork has the following additional changes:
+
+ * allow multi-line tasks
+ * add undo functionality (Ctrl-Z, Ctrl-Y) to task text
+ * colored background based on priority
+ * confirmation dialog before deleting tasks
+ * tweaks to UI to my preference (Nimbus look and feel, smaller fonts)
+
+I didn't bother to keep this compatibility with Java 7; you need at least Java 8 to compile.
+
+### Known issues
+
+When the “copy context/projects from selected task to new task” is activated, 
+clicking on any task brings the focus to the new task panel.
+I would prefer focus to stay with the clicked-on task, but could not get that working.
+Thanks to t7ko's toggle button, this is easy to work around though.
+(Only activate copy when you are about to create a new task.)
+
+### Running on HiDPI displays
+
+With 4k displays becoming more widespread, you might want to scale the UI up.
+Swing applications don't seem to have a great solution for that (one that automatically 
+uses the scaling of your desktop), 
+but I could at least get 2x scaling by manually running
+
+    java -Dsun.java2d.uiScale=2.0 -jar jar/jdotxt.jar
+
+# Original Readme
 
 [![CircleCI](https://circleci.com/gh/nicdnb/jdotxt/tree/master.svg?style=svg)](https://circleci.com/gh/nicdnb/jdotxt/tree/master)
 
@@ -50,7 +94,7 @@ to build jdotxt from its sources, you will need
 
 I use Ubuntu as a build system, simply run
 
-- sudo apt-get install openjdk-7-jdk ant
+- sudo apt-get install openjdk-11-jdk ant
 
 to set up your build system.
 

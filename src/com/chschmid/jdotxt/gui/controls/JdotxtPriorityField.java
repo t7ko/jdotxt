@@ -137,7 +137,7 @@ public class JdotxtPriorityField extends JTextField {
 	
 	private void setColor() {
 		if (getText().length() < 2) return;
-		if (getText().charAt(1) == '-') super.setForeground(JdotxtGUI.COLOR_GRAY_PANEL);
+//		if (getText().charAt(1) == '-') super.setForeground(JdotxtGUI.COLOR_GRAY_PANEL);
 		else super.setForeground(foreground);
 	}
 	
